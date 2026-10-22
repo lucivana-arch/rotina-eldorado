@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#C23A68">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Casa Eldorado">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8C%B7%3C/text%3E%3C/svg%3E">
+<title>Rotina da Casa da Eldorado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@600;700;800&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap" rel="stylesheet">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+[hidden] { display: none !important; }
+
+/* Layout: app de uma coluna para o celular. Cabeçalho fixo com os dias da semana e o progresso;
+   seções que abrem e fecham; linhas grandes para tocar com o polegar. */
+:root {
+  --bg: #F6F4F7;
+  --surface: #FFFFFF;
+  --fg: #23202B;
+  --muted: #6E6878;
+  --line: #E4DFE8;
+  --rose: #C23A68;
+  --rose-soft: #FBE7EE;
+  --on-rose: #FFFFFF;
+  --leaf: #2C7A5B;
+  --leaf-soft: #E3F2EA;
+  --on-leaf: #FFFFFF;
+  --font-display: "Gabarito", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17141C;
+    --surface: #221E29;
+    --fg: #F1EDF4;
+    --muted: #A9A1B3;
+    --line: #36303F;
+    --rose: #F27BA1;
+    --rose-soft: #3C2230;
+    --on-rose: #1B0F15;
+    --leaf: #6FCFA2;
+    --leaf-soft: #1C3229;
+    --on-leaf: #0F1E17;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17141C;
+  --surface: #221E29;
+  --fg: #F1EDF4;
+  --muted: #A9A1B3;
+  --line: #36303F;
+  --rose: #F27BA1;
+  --rose-soft: #3C2230;
+  --on-rose: #1B0F15;
+  --leaf: #6FCFA2;
+  --leaf-soft: #1C3229;
+  --on-leaf: #0F1E17;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.4;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--bg);
+  z-index: 10;
+}
+.wrap { max-width: 620px; margin: 0 auto; }
+button { font: inherit; color: inherit; }
+button:focus-visible, textarea:focus-visible { outline: 3px solid var(--rose); outline-offset: 2px; }
+
+/* Cabeçalho */
+header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 9;
+  background: var(--bg);
+  padding-block: 14px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h1 { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 24px; letter-spacing: -.01em; }
+h1 .tulip { color: var(--rose); }
+.week { margin: 0; font-size: 13px; color: var(--muted); white-space: nowrap; }
+
+.days { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 12px; }
+.day {
+  position: relative;
+  min-width: 0;
+  min-height: 62px;
+  padding: 8px 4px 9px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+}
+.day .dname { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1; }
+.day .dpct { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; line-height: 1; }
+.day .mini { width: 70%; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+.day .mini span { display: block; height: 100%; background: var(--leaf); width: 0; }
+.day[aria-selected="true"] { background: var(--rose); border-color: var(--rose); color: var(--on-rose); }
+.day[aria-selected="true"] .dpct { color: var(--on-rose); opacity: .85; }
+.day[aria-selected="true"] .mini { background: color-mix(in srgb, var(--on-rose) 30%, transparent); }
+.day[aria-selected="true"] .mini span { background: var(--on-rose); }
+.today-dot {
+  position: absolute; top: -7px; left: 50%; transform: translateX(-50%);
+  padding: 1px 7px; border-radius: 99px;
+  background: var(--leaf); color: var(--on-leaf);
+  font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+}
+
+.progress { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+.bar { flex: 1; height: 10px; border-radius: 5px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--leaf); border-radius: 5px; transition: width .3s ease; }
+.count { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; white-space: nowrap; }
+
+/* Topo do dia */
+.dayhead { margin-top: 20px; }
+h2.daytitle { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 28px; line-height: 1.1; text-wrap: balance; }
+.lead { margin: 6px 0 0; color: var(--muted); font-size: 15px; }
+.obs {
+  margin-top: 14px;
+  padding: 12px 14px;
+  background: var(--rose-soft);
+  border-radius: 14px;
+  font-size: 15px;
+  display: grid;
+  gap: 6px;
+}
+.obs p { margin: 0; }
+.obs b { color: var(--rose); }
+.finished {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--leaf-soft);
+  color: var(--leaf);
+  font-weight: 700;
+  font-size: 15px;
+}
+
+/* Seções */
+.sections { display: grid; gap: 12px; margin-top: 18px; }
+.sec { background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; overflow: hidden; }
+.sec.complete { border-color: color-mix(in srgb, var(--leaf) 45%, var(--line)); }
+.sechead {
+  width: 100%;
+  display: flex; align-items: center; gap: 12px;
+  min-height: 56px;
+  padding: 12px 14px;
+  background: none; border: 0; text-align: left; cursor: pointer;
+}
+.secnum {
+  flex: none; width: 30px; height: 30px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--rose-soft); color: var(--rose);
+  font-family: var(--font-display); font-weight: 700; font-size: 15px;
+}
+.sec.complete .secnum { background: var(--leaf); color: var(--on-leaf); }
+.secname { flex: 1; min-width: 0; font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1.2; }
+.secprog { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sec.complete .secprog { color: var(--leaf); font-weight: 700; }
+.chev { flex: none; width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg) translate(-2px, -2px); transition: transform .2s ease; }
+.sechead[aria-expanded="false"] .chev { transform: rotate(-45deg); }
+.secbody { padding: 0 10px 10px; display: grid; gap: 6px; }
+.secbody[hidden] { display: none !important; }
+
+.item {
+  display: flex; gap: 12px; align-items: flex-start;
+  min-height: 52px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--bg);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.item input {
+  appearance: none; -webkit-appearance: none;
+  flex: none; width: 28px; height: 28px; margin: 0;
+  border: 2px solid var(--muted); border-radius: 50%;
+  background: var(--surface);
+  display: grid; place-content: center;
+  cursor: pointer;
+  transition: background .15s ease, border-color .15s ease;
+}
+.item input::after {
+  content: ""; width: 12px; height: 7px;
+  border-left: 3px solid var(--on-leaf); border-bottom: 3px solid var(--on-leaf);
+  transform: rotate(-45deg) translate(1px, -1px) scale(0);
+  transition: transform .15s ease;
+}
+.item input:checked { background: var(--leaf); border-color: var(--leaf); }
+.item input:checked::after { transform: rotate(-45deg) translate(1px, -1px) scale(1); }
+.item input:focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+.item .txt { min-width: 0; padding-top: 2px; overflow-wrap: anywhere; }
+.item.done { background: var(--leaf-soft); }
+.item.done .txt { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
+
+.choice { padding: 4px 4px 2px; display: grid; gap: 8px; }
+.choice p { margin: 0; font-size: 14px; color: var(--muted); }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  flex: 1 1 140px; min-height: 44px; padding: 8px 12px;
+  border: 1.5px solid var(--line); border-radius: 99px;
+  background: var(--surface); cursor: pointer; font-weight: 700; font-size: 15px;
+}
+.pill[aria-pressed="true"] { background: var(--rose); border-color: var(--rose); color: var(--on-rose); }
+
+/* Fim do dia */
+.closing {
+  margin-top: 22px; padding: 16px;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px;
+  display: grid; gap: 10px;
+}
+.closing h3 { margin: 0; font-family: var(--font-display); font-weight: 700; font-size: 19px; }
+.closing p { margin: 0; color: var(--muted); font-size: 15px; }
+.closing label { font-size: 14px; font-weight: 700; }
+textarea {
+  width: 100%; min-height: 90px; padding: 12px;
+  border: 1.5px solid var(--line); border-radius: 12px;
+  background: var(--bg); color: var(--fg);
+  font: 16px/1.4 var(--font-body); resize: vertical;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn {
+  flex: 1 1 170px; min-height: 50px; padding: 10px 16px;
+  border-radius: 14px; border: 1.5px solid var(--rose);
+  background: var(--rose); color: var(--on-rose);
+  font-weight: 700; font-size: 16px; cursor: pointer;
+}
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.status { min-height: 20px; margin: 0; font-size: 14px; color: var(--muted); }
+.foot { margin-top: 16px; text-align: center; font-size: 13px; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) {
+  .bar span, .item input, .item input::after, .chev { transition: none; }
+}
+
+/* Conexão, nome e quem marcou */
+.conn { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+.conndot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.conn[data-state="live"] { color: var(--leaf); }
+.conn[data-state="live"] .conndot { background: var(--leaf); box-shadow: 0 0 0 3px var(--leaf-soft); }
+.conn[data-state="off"] { color: var(--rose); }
+.conn[data-state="off"] .conndot { background: var(--rose); }
+.whoami {
+  margin-top: 16px; padding: 14px 16px;
+  background: var(--surface); border: 1.5px solid var(--rose); border-radius: 16px;
+  display: grid; gap: 8px;
+}
+.whoami label { font-family: var(--font-display); font-weight: 700; font-size: 17px; }
+.whoami p { margin: 0; font-size: 14px; color: var(--muted); }
+.whorow { display: flex; gap: 8px; }
+.whorow input {
+  flex: 1; min-width: 0; min-height: 48px; padding: 10px 12px;
+  border: 1.5px solid var(--line); border-radius: 12px;
+  background: var(--bg); color: var(--fg); font: 16px var(--font-body);
+}
+.whorow input:focus-visible { outline: 3px solid var(--rose); outline-offset: 2px; }
+.btn.small { flex: none; min-height: 48px; padding: 8px 18px; }
+.item .txt { display: grid; gap: 2px; }
+.item.done .txt { text-decoration: none; }
+.item.done .txt .main { text-decoration: line-through; text-decoration-thickness: 1px; }
+.who { font-size: 13px; color: var(--leaf); font-weight: 700; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--rose); font-weight: 700; text-decoration: underline; cursor: pointer; font-size: inherit; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <h1><span class="tulip">🌷</span> Rotina da Casa da Eldorado</h1>
+      <p class="week"><span class="conn" id="conn" data-state="local"><span class="conndot"></span><span id="conntxt">Neste celular</span></span></p>
+    </div>
+    <div class="days" role="tablist" aria-label="Dia da rotina" id="days"></div>
+    <div class="progress">
+      <div class="bar" aria-hidden="true"><span id="barfill"></span></div>
+      <span class="count" id="count" aria-live="polite"></span>
+    </div>
+  </header>
+
+  <form class="whoami" id="whoami" hidden>
+    <label for="myname">Quem está usando este celular?</label>
+    <div class="whorow">
+      <input id="myname" type="text" autocomplete="given-name" placeholder="Seu nome, ex.: Rose" maxlength="30">
+      <button class="btn small" type="submit">Salvar</button>
+    </div>
+    <p>O nome aparece ao lado das tarefas que você marcar.</p>
+  </form>
+
+  <div class="dayhead">
+    <h2 class="daytitle" id="daytitle"></h2>
+    <p class="lead" id="lead"></p>
+    <div class="obs" id="obs"></div>
+    <div class="finished" id="finished" hidden>Tudo feito! Agora é só copiar o resumo e mandar. 😊</div>
+  </div>
+
+  <div class="sections" id="sections"></div>
+
+  <div class="closing">
+    <h3>No final do dia</h3>
+    <p>Me avise o que foi feito e o que ficou pendente.</p>
+    <label for="notes">Observações e pendências</label>
+    <textarea id="notes" placeholder="Ex.: não deu tempo de passar as roupas; acabou o papel higiênico"></textarea>
+    <textarea id="summary" readonly hidden aria-label="Resumo para copiar"></textarea>
+    <div class="actions">
+      <button class="btn" id="copy" type="button">Copiar resumo para o WhatsApp</button>
+      <button class="btn ghost" id="reset" type="button">Desmarcar este dia</button>
+    </div>
+    <p class="status" id="status" role="status"></p>
+  </div>
+
+  <p class="foot"><span id="meline"></span> As marcações recomeçam sozinhas a cada semana.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+/* ================= CONFIGURAÇÃO =================
+   Cole aqui a URL do projeto e a chave pública (anon / publishable) do Supabase.
+   Enquanto ficar como está, o app funciona só neste celular. */
+var SUPABASE_URL = "https://djmrihbvaahlwkellevd.supabase.co";
+var SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRqbXJpaGJ2YWFobHdrZWxsZXZkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI2OTc4MzQsImV4cCI6MjEwODI3MzgzNH0.6SG-BOTq_Xc3mrg2tuwnO1p2ZoHb4Ul9FpG3hPXTXV8";
+/* ================================================ */
+
+var DAYS = [
+  {
+    key: "seg", short: "Seg", name: "Segunda-feira", wd: 1,
+    lead: "Faxina principal depois do fim de semana.",
+    obs: [
+      "<b>Quartos e banheiros usados no fim de semana:</b> limpeza completa. Os que ficaram fechados podem ser apenas conferidos, se continuarem limpos."
+    ],
+    sections: [
+      ["Abrir e ventilar a casa", [
+        "Abrir portas e janelas para entrar ar e sol"
+      ]],
+      ["Cozinha", [
+        "Lavar, secar e guardar toda a louça",
+        "Limpar bem a pia e as torneiras",
+        "Limpar o fogão, retirando gordura e restos de comida",
+        "Limpar as bancadas e a mesa",
+        "Limpar o micro-ondas por dentro, se estiver sujo",
+        "Passar pano na parte externa da geladeira",
+        "Conferir se há alimentos estragados ou causando mau cheiro",
+        "Varrer e passar pano no chão",
+        "Retirar o lixo e colocar saco novo"
+      ]],
+      ["Quartos", [
+        "Arrumar a cama do quarto 1",
+        "Arrumar os outros quartos que foram usados no fim de semana",
+        "Trocar roupas de cama usadas, quando necessário",
+        "Tirar o pó dos móveis e cabeceiras dos quartos utilizados",
+        "Varrer e passar pano no chão dos quartos utilizados",
+        "Conferir os quartos fechados para ver se entrou poeira, insetos ou sujeira"
+      ]],
+      ["Banheiros internos", [
+        "Lavar completamente os banheiros que foram utilizados",
+        "Lavar vasos sanitários, pias, torneiras e espelhos",
+        "Lavar boxes, ralos e chão",
+        "Retirar insetos, teias de aranha e sujeiras dos cantos",
+        "Esvaziar lixeiras e colocar sacos novos",
+        "Repor papel higiênico"
+      ]],
+      ["Banheiros externos", [
+        "Lavar o banheiro masculino",
+        "Lavar o banheiro feminino",
+        "Lavar o lavatório e a pia entre os banheiros",
+        "Lavar vasos, pias, torneiras, ralos e chão",
+        "Conferir os cantos e atrás dos vasos",
+        "Retirar teias de aranha, insetos e sujeiras",
+        "Esvaziar lixeiras, colocar sacos novos e conferir papel higiênico"
+      ]],
+      ["Sala", [
+        "Tirar o pó dos móveis, mesas e objetos",
+        "Aspirar o tapete",
+        "Aspirar os trilhos das portas de vidro (ficam cheios de bicho morto)",
+        "Varrer e passar pano no chão",
+        "Retirar teias de aranha e sujeiras dos cantos"
+      ]],
+      ["Varanda e área gourmet principal", [
+        "Varrer e lavar o chão onde puder usar água",
+        "Limpar bem a mesa grande e as cadeiras",
+        "Passar lustra-móveis na mesa da varanda",
+        "Recolher e guardar as almofadas dos 3 balanços externos",
+        "Limpar a pia, o fogão e as bancadas da churrasqueira",
+        "Limpar a bancada escura, inclusive atrás dos objetos",
+        "Retirar poeira e sujeiras ao redor dos vasos, móveis e enfeites",
+        "Retirar teias de aranha dos cantos e partes altas",
+        "Limpar sujeiras deixadas por passarinhos e outros animais (cocô de rato)",
+        "Deixar a varanda e a área gourmet organizadas"
+      ]],
+      ["Roupas e lavanderia", [
+        "Separar roupas, toalhas e panos usados",
+        "Colocar as roupas para lavar",
+        "Estender as roupas",
+        "Recolher as peças que já estiverem secas",
+        "Dobrar e guardar roupas e toalhas",
+        "Separar as peças que precisam ser passadas",
+        "Limpar o tanque e organizar a lavanderia"
+      ]],
+      ["Antes de ir embora", [
+        "Conferir se ficou alguma louça suja",
+        "Conferir se os banheiros estão limpos e com sacos nas lixeiras",
+        "Verificar se ficou alguma roupa na máquina",
+        "Guardar os produtos de limpeza",
+        "Fechar portas e janelas",
+        "Deixar a casa organizada"
+      ]]
+    ]
+  },
+  {
+    key: "qua", short: "Qua", name: "Quarta-feira", wd: 3,
+    lead: "Manutenção da casa e uma tarefa detalhada da semana.",
+    obs: [
+      "<b>Tarefa alternada:</b> toda quarta tem uma limpeza mais detalhada, que eu aviso antes. Não é preciso fazer a capela e o Cantinho dos Meninos no mesmo dia.",
+      "Também posso pedir outras tarefas específicas, como limpeza detalhada de quartos, banheiros, geladeira ou armários."
+    ],
+    sections: [
+      ["Abrir e conferir a casa", [
+        "Abrir portas e janelas para ventilar",
+        "Conferir cozinha, sala, quartos e banheiros",
+        "Limpar o que estiver sujo ou pendente de segunda-feira"
+      ]],
+      ["Tarefa da semana", [{ choice: ["Capela", "Cantinho dos Meninos"] }]],
+      ["Cozinha", [
+        "Lavar, secar e guardar a louça que houver",
+        "Limpar pia, torneiras, fogão e bancadas",
+        "Conferir se há alimentos estragados ou causando mau cheiro",
+        "Varrer e passar pano no chão, se necessário",
+        "Retirar o lixo"
+      ]],
+      ["Varanda e área gourmet principal", [
+        "Limpar bancadas, mesas e cadeiras",
+        "Limpar atrás e ao redor dos vasos, enfeites e objetos",
+        "Retirar sujeiras deixadas por animais nas superfícies e nos cantos (cocô de rato)",
+        "Retirar teias de aranha dos cantos e partes altas",
+        "Limpar pia, fogão e churrasqueira, se estiverem sujos",
+        "Varrer e limpar o chão",
+        "Deixar tudo organizado"
+      ]],
+      ["Vidros da sala", [
+        "Limpar os vidros das portas e janelas da sala, principalmente pelo lado de fora",
+        "Retirar sujeiras e marcas deixadas pelos passarinhos",
+        "Conferir se ficaram manchas ou marcas depois da limpeza"
+      ]],
+      ["Banheiros externos", [
+        "Conferir os banheiros masculino e feminino e o lavatório",
+        "Lavar vasos, pias, torneiras e chão, se estiverem sujos",
+        "Retirar teias de aranha e insetos",
+        "Conferir lixeiras e papel higiênico"
+      ]],
+      ["Roupas e lavanderia", [
+        "Recolher, dobrar e guardar roupas secas",
+        "Passar as roupas pendentes, conforme o tempo disponível",
+        "Organizar roupas de cama e toalhas nos armários",
+        "Deixar a lavanderia limpa e organizada"
+      ]],
+      ["Organização geral", [
+        "Limpar sujeiras visíveis em móveis e superfícies",
+        "Conferir o quarto 1 e o banheiro 1, limpando o que estiver sujo",
+        "Organizar os ambientes que precisarem de atenção"
+      ]],
+      ["Antes de ir embora", [
+        "Conferir se a cozinha está limpa e sem louça suja",
+        "Conferir banheiros e lixeiras",
+        "Verificar se ficou roupa na máquina",
+        "Guardar os produtos de limpeza",
+        "Fechar portas e janelas",
+        "Deixar tudo organizado"
+      ]]
+    ]
+  },
+  {
+    key: "sex", short: "Sex", name: "Sexta-feira", wd: 5,
+    lead: "Deixar a casa pronta para a nossa chegada no fim de semana.",
+    obs: [
+      "<b>Quartos:</b> o quarto 1 e o banheiro 1 devem estar sempre limpos e arrumados para a nossa chegada. Vou avisar quais outros quartos e banheiros serão usados no fim de semana.",
+      "<b>Vidros da sala:</b> conferir de novo, principalmente pelo lado de fora. Se tiver sujeira de passarinho, manchas ou marcas, limpar outra vez."
+    ],
+    sections: [
+      ["Abrir e ventilar a casa", [
+        "Abrir portas e janelas para ventilar",
+        "Conferir se há poeira, insetos ou sujeiras acumuladas"
+      ]],
+      ["Quarto 1 e banheiro 1", [
+        "Arrumar a cama e organizar o quarto",
+        "Tirar o pó dos móveis e cabeceiras",
+        "Varrer e passar pano no chão",
+        "Lavar o banheiro: vaso sanitário, pia, torneiras, espelho, box e chão",
+        "Colocar toalhas limpas, quando necessário",
+        "Conferir papel higiênico e lixeira",
+        "Deixar o quarto e o banheiro prontos para a nossa chegada"
+      ]],
+      ["Demais quartos e banheiros", [
+        "Verificar comigo quais quartos serão usados no fim de semana",
+        "Arrumar os quartos que eu informar, deixando as camas prontas",
+        "Lavar e preparar os banheiros desses quartos",
+        "Colocar toalhas limpas e conferir papel higiênico e lixeiras",
+        "Conferir se os quartos fechados continuam limpos e organizados"
+      ]],
+      ["Cozinha", [
+        "Lavar, secar e guardar toda a louça",
+        "Limpar pia, torneiras, fogão, bancadas e mesa",
+        "Conferir geladeira e alimentos",
+        "Varrer e passar pano no chão",
+        "Retirar o lixo e colocar saco novo"
+      ]],
+      ["Sala", [
+        "Tirar o pó dos móveis, mesas e objetos",
+        "Aspirar o tapete",
+        "Aspirar os trilhos das portas de vidro (ficam cheios de bicho morto)",
+        "Varrer e passar pano no chão",
+        "Conferir se há teias de aranha ou sujeiras nos cantos",
+        "Conferir os vidros da sala por fora e limpar se tiver marcas"
+      ]],
+      ["Varanda e área gourmet principal", [
+        "Limpar mesas, cadeiras, pia e bancadas",
+        "Tirar as almofadas guardadas e colocar nos 3 balanços externos",
+        "Conferir se as almofadas estão limpas; se tiver cocô de passarinho, passar pano molhado",
+        "Conferir o jogo de poltronas e cadeiras externas e limpar se tiver cocô de passarinho ou morcego",
+        "Limpar ao redor dos vasos, móveis e objetos decorativos",
+        "Retirar sujeiras deixadas por animais (cocô de rato)",
+        "Retirar teias de aranha",
+        "Varrer e limpar o chão",
+        "Deixar a churrasqueira e a área de convivência organizadas"
+      ]],
+      ["Banheiros externos", [
+        "Lavar o banheiro masculino e o feminino",
+        "Lavar o lavatório entre eles",
+        "Conferir vasos, pias, torneiras, chão e ralos",
+        "Retirar teias de aranha, insetos e sujeiras",
+        "Repor papel higiênico",
+        "Esvaziar lixeiras e colocar sacos novos"
+      ]],
+      ["Roupas e lavanderia", [
+        "Recolher, dobrar e guardar roupas secas",
+        "Guardar toalhas e roupas de cama",
+        "Verificar se ficou roupa na máquina",
+        "Deixar a lavanderia organizada"
+      ]],
+      ["Preparar o jantar", [
+        "Preparar o jantar combinado para sexta-feira",
+        "Deixar a comida guardada adequadamente",
+        "Limpar a cozinha depois do preparo"
+      ]],
+      ["Antes de ir embora", [
+        "Conferir se os quartos e banheiros que serão usados estão prontos",
+        "Retirar o lixo e guardar os produtos de limpeza",
+        "Deixar a casa limpa, organizada e agradável",
+        "Fechar portas e janelas"
+      ]]
+    ]
+  },
+  {
+    key: "sab", short: "Sáb", name: "Sábado", wd: 6,
+    lead: "Café da manhã, almoço e organização da casa. Expediente até as 14h.",
+    obs: [
+      "<b>Sábado o expediente vai até as 14h.</b> O dia é principalmente para o café da manhã (se der tempo), o almoço e manter a casa organizada, sem repetir as faxinas completas da semana. Não precisa lavar os banheiros.",
+      "No final do expediente, me avise se ficou alguma tarefa pendente."
+    ],
+    sections: [
+      ["Café da manhã", [
+        "Colocar o café da manhã, se der tempo"
+      ]],
+      ["Quartos", [
+        "Estender as camas dos quartos que estiverem sendo usados"
+      ]],
+      ["Cozinha e almoço", [
+        "Preparar o almoço combinado para sábado",
+        "Lavar, secar e guardar a louça usada",
+        "Limpar pia, fogão, bancadas e mesa depois do preparo",
+        "Deixar os alimentos guardados adequadamente",
+        "Retirar o lixo da cozinha, se necessário"
+      ]],
+      ["Sala e áreas de convivência", [
+        "Recolher copos, pratos e outros objetos usados",
+        "Limpar sujeiras visíveis nas superfícies",
+        "Varrer ou limpar o chão onde estiver sujo"
+      ]],
+      ["Varanda e área gourmet principal", [
+        "Recolher louças e objetos usados",
+        "Limpar mesas, cadeiras e bancadas que estiverem sujas",
+        "Retirar sujeiras de animais que aparecerem (cocô de rato)",
+        "Varrer as áreas que precisarem",
+        "Deixar o ambiente organizado para o fim de semana"
+      ]],
+      ["Banheiros", [
+        "Dar uma passada nos banheiros que estiverem sendo usados",
+        "Retirar o lixo, se estiver muito cheio"
+      ]],
+      ["Organização geral", [
+        "Arrumar o que estiver fora do lugar",
+        "Guardar roupas ou toalhas secas pendentes, se houver tempo",
+        "Conferir se a cozinha e as áreas de convivência estão organizadas"
+      ]],
+      ["Antes de ir embora", [
+        "Deixar a cozinha limpa depois do almoço",
+        "Guardar produtos e utensílios usados",
+        "Retirar o lixo que precisar ser recolhido",
+        "Deixar os ambientes organizados"
+      ]]
+    ]
+  }
+];
+
+DAYS.forEach(function (d) {
+  d.secs = d.sections.map(function (s, si) {
+    return {
+      name: s[0],
+      items: s[1].map(function (it, ii) {
+        var id = d.key + "-" + si + "-" + ii;
+        if (typeof it === "string") return { id: id, t: it };
+        return { id: id, choice: it.choice };
+      })
+    };
+  });
+});
+var ITEM_DAY = {};
+DAYS.forEach(function (d) { d.secs.forEach(function (s) { s.items.forEach(function (i) { ITEM_DAY[i.id] = d.key; }); }); });
+function dayByKey(k) { for (var i = 0; i < DAYS.length; i++) if (DAYS[i].key === k) return DAYS[i]; return DAYS[0]; }
+function allItems(d) { var o = []; d.secs.forEach(function (s) { o = o.concat(s.items); }); return o; }
+
+function pad(n) { return (n < 10 ? "0" : "") + n; }
+var now = new Date();
+var monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - ((now.getDay() + 6) % 7));
+var WEEK = monday.getFullYear() + "-" + pad(monday.getMonth() + 1) + "-" + pad(monday.getDate());
+function dateOf(d) { var x = new Date(monday); x.setDate(monday.getDate() + (d.wd - 1)); return x; }
+function fmt(dt) { return pad(dt.getDate()) + "/" + pad(dt.getMonth() + 1); }
+function hhmm(iso) { var t = new Date(iso); return isNaN(t) ? "" : pad(t.getHours()) + ":" + pad(t.getMinutes()); }
+
+var wdNow = now.getDay();
+var defaultKey = { 0: "seg", 1: "seg", 2: "qua", 3: "qua", 4: "sex", 5: "sex", 6: "sab" }[wdNow];
+var todayKey = { 1: "seg", 3: "qua", 5: "sex", 6: "sab" }[wdNow] || null;
+
+/* ---------- estado ---------- */
+var KEY = "rotina-eldorado-v4";
+var store = { week: WEEK, checked: {}, by: {}, choice: {}, notes: {}, collapsed: {}, me: "" };
+try {
+  var saved = JSON.parse(localStorage.getItem(KEY) || "null");
+  if (saved && typeof saved === "object") {
+    store.collapsed = saved.collapsed || {};
+    store.me = saved.me || "";
+    if (saved.week === WEEK) {
+      store.checked = saved.checked || {};
+      store.by = saved.by || {};
+      store.choice = saved.choice || {};
+      store.notes = saved.notes || {};
+    }
+  }
+} catch (e) {}
+store.week = WEEK;
+function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+
+var current = defaultKey;
+var $ = function (id) { return document.getElementById(id); };
+function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+/* ---------- conexão com o banco ---------- */
+var db = null;
+var LIVE = /^https:\/\//.test(SUPABASE_URL) && SUPABASE_KEY.indexOf("COLE_AQUI") !== 0 && window.supabase;
+if (LIVE) {
+  try { db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { db = null; }
+}
+function setConn(state) {
+  var el = $("conn");
+  el.setAttribute("data-state", state);
+  $("conntxt").textContent = state === "live" ? "Ao vivo" : state === "off" ? "Sem conexão" : state === "wait" ? "Conectando…" : "Neste celular";
+}
+setConn(db ? "wait" : "local");
+
+function applyMark(r) {
+  if (!r || r.semana !== WEEK) return;
+  if (r.feito) { store.checked[r.item_id] = true; store.by[r.item_id] = { n: r.feito_por || "", t: r.atualizado_em }; }
+  else { delete store.checked[r.item_id]; delete store.by[r.item_id]; }
+  var cb = document.querySelector('input[data-id="' + r.item_id + '"]');
+  if (cb) {
+    cb.checked = !!r.feito;
+    cb.closest(".item").classList.toggle("done", !!r.feito);
+    paintWho(r.item_id);
+  }
+}
+function applyDay(r) {
+  if (!r || r.semana !== WEEK) return;
+  store.choice[r.dia] = r.escolha || "";
+  store.notes[r.dia] = r.notas || "";
+  if (r.dia === current) {
+    var notes = $("notes");
+    if (document.activeElement !== notes) notes.value = store.notes[r.dia];
+    refreshChoice();
+  }
+}
+
+function pull() {
+  if (!db) return Promise.resolve();
+  return Promise.all([
+    db.from("rotina_marcas").select("*").eq("semana", WEEK),
+    db.from("rotina_dia").select("*").eq("semana", WEEK)
+  ]).then(function (res) {
+    if (res[0].error || res[1].error) throw (res[0].error || res[1].error);
+    store.checked = {}; store.by = {};
+    res[0].data.forEach(function (r) {
+      if (r.feito) { store.checked[r.item_id] = true; store.by[r.item_id] = { n: r.feito_por || "", t: r.atualizado_em }; }
+    });
+    res[1].data.forEach(function (r) { store.choice[r.dia] = r.escolha || ""; store.notes[r.dia] = r.notas || ""; });
+    save();
+    renderDays();
+    renderDay();
+    setConn("live");
+  }).catch(function () { setConn("off"); });
+}
+
+function subscribe() {
+  if (!db) return;
+  db.channel("rotina-" + WEEK)
+    .on("postgres_changes", { event: "*", schema: "public", table: "rotina_marcas", filter: "semana=eq." + WEEK },
+      function (p) { applyMark(p.new); save(); updateProgress(); })
+    .on("postgres_changes", { event: "*", schema: "public", table: "rotina_dia", filter: "semana=eq." + WEEK },
+      function (p) { applyDay(p.new); save(); })
+    .subscribe(function (status) {
+      if (status === "SUBSCRIBED") setConn("live");
+      else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED") setConn("off");
+    });
+}
+
+function pushMarks(rows) {
+  if (!db || !rows.length) return;
+  db.from("rotina_marcas").upsert(rows, { onConflict: "semana,item_id" }).then(function (r) {
+    if (r.error) { setConn("off"); $("status").textContent = "Não consegui salvar no servidor. A marcação ficou guardada neste celular; confira a internet."; }
+  });
+}
+var dayTimer = null;
+function pushDay(dayKey, delay) {
+  if (!db) return;
+  clearTimeout(dayTimer);
+  dayTimer = setTimeout(function () {
+    db.from("rotina_dia").upsert({
+      semana: WEEK, dia: dayKey,
+      escolha: store.choice[dayKey] || null,
+      notas: store.notes[dayKey] || null,
+      atualizado_em: new Date().toISOString()
+    }, { onConflict: "semana,dia" }).then(function (r) { if (r.error) setConn("off"); });
+  }, delay || 0);
+}
+
+/* ---------- desenho da tela ---------- */
+function itemLabel(d, it) {
+  if (!it.choice) return it.t;
+  var c = store.choice[d.key];
+  return c ? "Limpeza completa: " + c : "Limpeza completa da tarefa da semana";
+}
+function whoText(id) {
+  var b = store.by[id];
+  if (!store.checked[id] || !b) return "";
+  var parts = [];
+  if (b.n) parts.push(b.n);
+  var h = b.t ? hhmm(b.t) : "";
+  if (h) parts.push(h);
+  return parts.join(" · ");
+}
+function paintWho(id) {
+  var el = document.querySelector('[data-who="' + id + '"]');
+  if (el) { var t = whoText(id); el.textContent = t; el.hidden = !t; }
+}
+function stats(d) {
+  var items = allItems(d);
+  var done = items.filter(function (i) { return store.checked[i.id]; }).length;
+  return { done: done, total: items.length };
+}
+
+function renderDays() {
+  $("days").innerHTML = DAYS.map(function (d) {
+    var s = stats(d);
+    var pct = s.total ? Math.round(s.done / s.total * 100) : 0;
+    return '<button class="day" role="tab" type="button" data-day="' + d.key + '" aria-selected="' + (d.key === current) + '" aria-label="' + d.name + ', ' + pct + ' por cento">' +
+      (d.key === todayKey ? '<span class="today-dot">hoje</span>' : "") +
+      '<span class="dname">' + d.short + '</span>' +
+      '<span class="mini" aria-hidden="true"><span style="width:' + pct + '%"></span></span>' +
+      '<span class="dpct">' + fmt(dateOf(d)) + '</span></button>';
+  }).join("");
+}
+
+function renderDay() {
+  var d = dayByKey(current);
+  $("daytitle").textContent = d.name + ", " + fmt(dateOf(d));
+  $("lead").textContent = d.lead;
+  $("obs").innerHTML = d.obs.map(function (p) { return "<p>" + p + "</p>"; }).join("");
+  var html = "";
+  d.secs.forEach(function (s, si) {
+    var ck = d.key + "-" + si;
+    var open = !store.collapsed[ck];
+    html += '<div class="sec" data-sec="' + si + '">' +
+      '<button class="sechead" type="button" aria-expanded="' + open + '" data-toggle="' + ck + '">' +
+      '<span class="secnum">' + (si + 1) + '</span>' +
+      '<span class="secname">' + esc(s.name) + '</span>' +
+      '<span class="secprog"></span><span class="chev" aria-hidden="true"></span></button>' +
+      '<div class="secbody"' + (open ? "" : " hidden") + '>';
+    s.items.forEach(function (it) {
+      if (it.choice) {
+        var c = store.choice[d.key] || "";
+        html += '<div class="choice"><p>Qual ambiente nesta semana?</p><div class="pills">' +
+          it.choice.map(function (opt) {
+            return '<button type="button" class="pill" data-choice="' + esc(opt) + '" aria-pressed="' + (c === opt) + '">' + esc(opt) + '</button>';
+          }).join("") + '</div></div>';
+      }
+      var done = !!store.checked[it.id];
+      var who = whoText(it.id);
+      html += '<label class="item' + (done ? " done" : "") + '"><input type="checkbox" data-id="' + it.id + '"' + (done ? " checked" : "") + '>' +
+        '<span class="txt"><span class="main" data-label="' + it.id + '">' + esc(itemLabel(d, it)) + '</span>' +
+        '<span class="who" data-who="' + it.id + '"' + (who ? "" : " hidden") + '>' + esc(who) + '</span></span></label>';
+    });
+    html += "</div></div>";
+  });
+  $("sections").innerHTML = html;
+  $("notes").value = store.notes[d.key] || "";
+  updateProgress();
+}
+
+function refreshChoice() {
+  var d = dayByKey(current);
+  document.querySelectorAll(".pill").forEach(function (x) {
+    x.setAttribute("aria-pressed", String(x.getAttribute("data-choice") === (store.choice[d.key] || "")));
+  });
+  d.secs.forEach(function (s) { s.items.forEach(function (it) {
+    if (it.choice) { var l = document.querySelector('[data-label="' + it.id + '"]'); if (l) l.textContent = itemLabel(d, it); }
+  }); });
+}
+
+function updateProgress() {
+  var d = dayByKey(current);
+  var s = stats(d);
+  $("count").textContent = s.done + " de " + s.total;
+  $("barfill").style.width = (s.total ? s.done / s.total * 100 : 0) + "%";
+  $("finished").hidden = !(s.total && s.done === s.total);
+  d.secs.forEach(function (sec, si) {
+    var el = document.querySelector('.sec[data-sec="' + si + '"]');
+    if (!el) return;
+    var dn = sec.items.filter(function (i) { return store.checked[i.id]; }).length;
+    var complete = dn === sec.items.length;
+    el.classList.toggle("complete", complete);
+    el.querySelector(".secprog").textContent = complete ? "Feito" : dn + "/" + sec.items.length;
+  });
+  DAYS.forEach(function (dd) {
+    var b = document.querySelector('.day[data-day="' + dd.key + '"] .mini span');
+    if (b) { var st = stats(dd); b.style.width = (st.total ? st.done / st.total * 100 : 0) + "%"; }
+  });
+}
+
+function renderMe() {
+  $("whoami").hidden = !!store.me;
+  $("meline").innerHTML = store.me ? 'Marcando como <b>' + esc(store.me) + '</b> · <button type="button" class="linkbtn" id="changeme">trocar</button>.' : "";
+}
+
+/* ---------- eventos ---------- */
+$("whoami").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var n = $("myname").value.trim();
+  if (!n) { $("myname").focus(); return; }
+  store.me = n;
+  save();
+  renderMe();
+});
+document.addEventListener("click", function (e) {
+  if (e.target && e.target.id === "changeme") {
+    $("myname").value = store.me;
+    store.me = "";
+    save();
+    renderMe();
+    $("myname").focus();
+    window.scrollTo(0, 0);
+  }
+});
+
+$("days").addEventListener("click", function (e) {
+  var b = e.target.closest(".day");
+  if (!b) return;
+  current = b.getAttribute("data-day");
+  $("status").textContent = "";
+  $("summary").hidden = true;
+  armReset(false);
+  renderDays();
+  renderDay();
+  window.scrollTo(0, 0);
+});
+
+$("sections").addEventListener("click", function (e) {
+  var t = e.target.closest("[data-toggle]");
+  if (t) {
+    var ck = t.getAttribute("data-toggle");
+    var open = t.getAttribute("aria-expanded") === "true";
+    t.setAttribute("aria-expanded", String(!open));
+    t.nextElementSibling.hidden = open;
+    if (open) store.collapsed[ck] = true; else delete store.collapsed[ck];
+    save();
+    return;
+  }
+  var p = e.target.closest(".pill");
+  if (p) {
+    var d = dayByKey(current);
+    var opt = p.getAttribute("data-choice");
+    store.choice[d.key] = store.choice[d.key] === opt ? "" : opt;
+    refreshChoice();
+    save();
+    pushDay(d.key, 0);
+  }
+});
+
+$("sections").addEventListener("change", function (e) {
+  var cb = e.target;
+  if (!cb || cb.type !== "checkbox") return;
+  var id = cb.getAttribute("data-id");
+  var at = new Date().toISOString();
+  if (cb.checked) { store.checked[id] = true; store.by[id] = { n: store.me, t: at }; }
+  else { delete store.checked[id]; delete store.by[id]; }
+  cb.closest(".item").classList.toggle("done", cb.checked);
+  paintWho(id);
+  save();
+  updateProgress();
+  pushMarks([{ semana: WEEK, item_id: id, dia: ITEM_DAY[id], feito: cb.checked, feito_por: cb.checked ? (store.me || null) : null, atualizado_em: at }]);
+});
+
+$("notes").addEventListener("input", function () {
+  store.notes[current] = $("notes").value;
+  save();
+  pushDay(current, 900);
+});
+
+function buildSummary() {
+  var d = dayByKey(current);
+  var s = stats(d);
+  var lines = ["🌷 " + d.name + ", " + fmt(dateOf(d)) + ": " + s.done + " de " + s.total + " tarefas feitas."];
+  if (store.choice[d.key]) lines.push("Tarefa da semana: " + store.choice[d.key] + ".");
+  var pend = [];
+  d.secs.forEach(function (sec) {
+    var p = sec.items.filter(function (i) { return !store.checked[i.id]; });
+    if (p.length) {
+      pend.push("", sec.name + ":");
+      p.forEach(function (i) { pend.push("- " + itemLabel(d, i)); });
+    }
+  });
+  if (pend.length) { lines.push("", "Ficou pendente:"); lines = lines.concat(pend); }
+  else lines.push("", "Tudo feito! ✅");
+  var n = (store.notes[d.key] || "").trim();
+  if (n) lines.push("", "Observações: " + n);
+  return lines.join("\n");
+}
+
+$("copy").addEventListener("click", function () {
+  var text = buildSummary();
+  var box = $("summary");
+  box.value = text;
+  function fallback() {
+    box.hidden = false;
+    box.focus();
+    box.select();
+    $("status").textContent = "Não consegui copiar sozinho. Segure o texto acima e toque em Copiar.";
+  }
+  try {
+    navigator.clipboard.writeText(text).then(function () {
+      box.hidden = true;
+      $("status").textContent = "Resumo copiado. É só colar no WhatsApp.";
+    }, fallback);
+  } catch (err) { fallback(); }
+});
+
+var armed = false, armTimer = null;
+function armReset(on) {
+  armed = on;
+  clearTimeout(armTimer);
+  $("reset").textContent = on ? "Toque de novo para confirmar" : "Desmarcar este dia";
+  if (on) armTimer = setTimeout(function () { armReset(false); }, 4000);
+}
+$("reset").addEventListener("click", function () {
+  if (!armed) { armReset(true); return; }
+  var d = dayByKey(current);
+  var at = new Date().toISOString();
+  var rows = allItems(d).map(function (i) {
+    delete store.checked[i.id]; delete store.by[i.id];
+    return { semana: WEEK, item_id: i.id, dia: d.key, feito: false, feito_por: null, atualizado_em: at };
+  });
+  store.notes[d.key] = "";
+  store.choice[d.key] = "";
+  armReset(false);
+  $("summary").hidden = true;
+  $("status").textContent = "Dia desmarcado.";
+  save();
+  renderDays();
+  renderDay();
+  pushMarks(rows);
+  pushDay(d.key, 0);
+});
+
+document.addEventListener("visibilitychange", function () {
+  if (document.visibilityState === "visible" && db) pull();
+});
+
+/* ---------- início ---------- */
+save();
+renderMe();
+renderDays();
+renderDay();
+if (db) { pull().then(subscribe); }
+</script>
+
+</body>
+</html>
